@@ -1,0 +1,50 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import penguins from '../../assets/penguins.json';
+
+// Consigne stricte : Utilisation de getStaticPaths
+export function getStaticPaths() {
+  // On récupère toutes les espèces uniques
+  const especesUniques = [...new Set(penguins.map(p => p.species).filter(Boolean))];
+  
+  // On retourne un tableau d'objets, où chaque objet définit les paramètres d'une URL
+  return especesUniques.map(espece => ({
+    params: { species: espece },
+  }));
+}
+
+// Astro va boucler sur les paramètres fournis au-dessus et on récupère l'espèce actuelle
+const { species } = Astro.params;
+---
+
+<Layout title={`Statique : ${species}`}>
+  <main class="max-w-4xl mx-auto py-10 px-6">
+    <a href="/rendu-statique" class="text-emerald-500 hover:underline mb-6 inline-block">← Retour au menu statique</a>
+    <h1 class="text-3xl font-bold mb-6">Graphique Statique : {species}</h1>
+    
+    <div id="graphique" data-espece={species} class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto"></div>
+
+    <script>
+      import * as Plot from "@observablehq/plot";
+      import penguins from "../../assets/penguins.json";
+
+      const conteneur = document.querySelector('#graphique');
+      const espece = conteneur?.getAttribute('data-espece');
+      
+      const dataFiltree = penguins.filter((d: any) => d.species === espece);
+
+      if (conteneur) {
+        const plot = Plot.plot({
+          marks: [
+            Plot.dot(dataFiltree, { 
+              x: "culmen_length_mm", 
+              y: "culmen_depth_mm", 
+              fill: "species" 
+            })
+          ]
+        });
+        conteneur.append(plot);
+      }
+    </script>
+  </main>
+</Layout>

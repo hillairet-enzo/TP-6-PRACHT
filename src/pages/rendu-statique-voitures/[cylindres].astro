@@ -1,0 +1,46 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import cars from '../../assets/cars.json';
+
+// Pré-calcul de toutes les URLs possibles (Consigne du TP)
+export function getStaticPaths() {
+  const cylindresUniques = [...new Set(cars.map(c => c.cylinders).filter(Boolean))].sort();
+  
+  return cylindresUniques.map(cylindre => ({
+    // Astro exige que les paramètres soient des chaînes de caractères (String)
+    params: { cylindres: String(cylindre) },
+  }));
+}
+
+const { cylindres } = Astro.params;
+---
+
+<Layout title={`Statique : ${cylindres} Cylindres`}>
+  <div class="mb-8">
+    <a href="/rendu-statique-voitures" class="text-slate-500 hover:text-slate-800 text-sm mb-4 inline-block">← Retour au menu</a>
+    <h1 class="text-2xl font-bold text-slate-800">Moteur {cylindres} Cylindres (SSG)</h1>
+  </div>
+  
+  <div id="graphique" data-cylindre={cylindres} class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"></div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    import cars from "../../assets/cars.json";
+
+    const conteneur = document.querySelector('#graphique');
+    const cylindreNum = Number(conteneur?.getAttribute('data-cylindre'));
+    
+    const dataFiltree = cars.filter((c: any) => c.cylinders === cylindreNum);
+
+    if (conteneur) {
+      const plot = Plot.plot({
+        width: 600,
+        height: 350,
+        marks: [
+          Plot.dot(dataFiltree, { x: "power (hp)", y: "economy (mpg)", fill: "#10b981", tip: true }) // Couleur verte pour différencier
+        ]
+      });
+      conteneur.append(plot);
+    }
+  </script>
+</Layout>

@@ -1,0 +1,46 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// Consigne stricte : on désactive le pré-rendu statique pour cette page
+export const prerender = false;
+
+// On récupère le nom de l'espèce directement depuis l'URL (ex: /rendu-dynamique/Adelie)
+const { species } = Astro.params;
+---
+
+<Layout title={`Dynamique : ${species}`}>
+  <main class="max-w-4xl mx-auto py-10 px-6">
+    <a href="/rendu-dynamique" class="text-blue-500 hover:underline mb-6 inline-block">← Retour au menu</a>
+    <h1 class="text-3xl font-bold mb-6">Graphique de l'espèce : {species}</h1>
+    
+    <!-- On passe la variable "species" au script via l'attribut data-espece -->
+    <div id="graphique" data-espece={species} class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto"></div>
+
+    <script>
+      import * as Plot from "@observablehq/plot";
+      import penguins from "../../assets/penguins.json";
+
+      // On cible le conteneur unique de cette page
+      const conteneur = document.querySelector('#graphique');
+      
+      // On lit l'espèce demandée
+      const espece = conteneur?.getAttribute('data-espece');
+      
+      // On filtre et on dessine
+      const dataFiltree = penguins.filter((d: any) => d.species === espece);
+
+      if (conteneur) {
+        const plot = Plot.plot({
+          marks: [
+            Plot.dot(dataFiltree, { 
+              x: "culmen_length_mm", 
+              y: "culmen_depth_mm", 
+              fill: "species" 
+            })
+          ]
+        });
+        conteneur.append(plot);
+      }
+    </script>
+  </main>
+</Layout>

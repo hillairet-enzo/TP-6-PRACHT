@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+import penguins from '../assets/penguins.json';
+
+// 1. Déterminer automatiquement la liste des espèces (Consigne stricte)
+const especesUniques = [...new Set(penguins.map(p => p.species).filter(Boolean))];
+---
+
+<Layout title="Boucle Pingouins">
+  <main class="max-w-6xl mx-auto py-10 px-6">
+    <h1 class="text-3xl font-bold text-slate-800 mb-8">Tous les pingouins (Générés par boucle)</h1>
+    
+    <!-- 2. Boucle map pour générer les conteneurs -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {especesUniques.map((espece) => (
+        <div class="bg-white p-6 rounded-xl shadow border border-slate-200">
+          <h2 class="text-xl font-bold text-slate-700 mb-4">{espece}</h2>
+          
+          <!-- On stocke le nom de l'espèce dans un attribut de données "data-espece" -->
+          <div class="graphique-container overflow-x-auto" data-espece={espece}></div>
+        </div>
+      ))}
+    </div>
+
+    <!-- 3. Rendu Observable Plot côté client -->
+    <script>
+      import * as Plot from "@observablehq/plot";
+      import penguins from "../assets/penguins.json";
+
+      // On cible toutes les divs générées par notre boucle
+      const conteneurs = document.querySelectorAll('.graphique-container');
+
+      conteneurs.forEach(conteneur => {
+        // On lit l'espèce associée à cette div
+        const espece = conteneur.getAttribute('data-espece');
+        
+        // On filtre les données
+        const dataFiltree = penguins.filter((p: any) => p.species === espece);
+
+        // On crée le graphique
+        const plot = Plot.plot({
+          width: 300, // Largeur adaptée à la carte
+          marks: [
+            Plot.dot(dataFiltree, { 
+              x: "culmen_length_mm", 
+              y: "culmen_depth_mm", 
+              fill: "species" 
+            })
+          ]
+        });
+        
+        // On injecte le graphique dans la div
+        conteneur.append(plot);
+      });
+    </script>
+  </main>
+</Layout>

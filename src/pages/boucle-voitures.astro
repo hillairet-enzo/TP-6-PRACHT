@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import cars from '../assets/cars.json';
+
+// On utilise "cylinders" au lieu de "Origin" et on les trie dans l'ordre croissant
+const cylindresUniques = [...new Set(cars.map(c => c.cylinders).filter(Boolean))].sort();
+---
+
+<Layout title="Voitures (Boucle)">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800">Performances par Cylindres</h1>
+    <p class="text-slate-500 mt-1">Puissance vs Consommation selon la motorisation</p>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {cylindresUniques.map((cylindre) => (
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-bold text-slate-700 mb-4">Moteur {cylindre} Cylindres</h2>
+        
+        <!-- On stocke la valeur dans data-cylindre -->
+        <div class="graphique-voiture overflow-x-auto" data-cylindre={cylindre}></div>
+      </div>
+    ))}
+  </div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    import cars from "../assets/cars.json";
+
+    const conteneurs = document.querySelectorAll('.graphique-voiture');
+
+    conteneurs.forEach(conteneur => {
+      // On récupère la valeur de l'attribut HTML et on la convertit en nombre (Number)
+      const cylindre = Number(conteneur.getAttribute('data-cylindre'));
+      
+      // On filtre le dataset
+      const dataFiltree = cars.filter((c: any) => c.cylinders === cylindre);
+
+      const plot = Plot.plot({
+        width: 300,
+        height: 250,
+        marks: [
+          Plot.dot(dataFiltree, { 
+            x: "power (hp)",         // Puissance en abscisse
+            y: "economy (mpg)",      // Consommation en ordonnée
+            fill: "#3b82f6",         // Couleur bleue fixe pour être propre
+            tip: true                // Bulle d'info au survol !
+          })
+        ]
+      });
+      
+      conteneur.append(plot);
+    });
+  </script>
+</Layout>

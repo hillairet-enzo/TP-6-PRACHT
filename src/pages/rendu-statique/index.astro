@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import penguins from '../../assets/penguins.json';
+
+const especesUniques = [...new Set(penguins.map(p => p.species).filter(Boolean))];
+---
+
+<Layout title="Menu Statique">
+  <main class="max-w-4xl mx-auto py-10 px-6">
+    <a href="/" class="text-blue-500 hover:underline mb-6 inline-block">← Retour accueil</a>
+    <h1 class="text-3xl font-bold mb-8">Rendu Statique (SSG)</h1>
+    
+    <div class="flex gap-4">
+      {especesUniques.map((espece) => (
+        <a 
+          href={`/rendu-statique/${espece}`} 
+          class="p-4 bg-white border border-emerald-200 rounded-lg shadow-sm hover:bg-emerald-50 text-emerald-600 font-bold transition-colors"
+        >
+          Voir {espece}
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>

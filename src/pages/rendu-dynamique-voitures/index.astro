@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import cars from '../../assets/cars.json';
+
+const cylindresUniques = [...new Set(cars.map(c => c.cylinders).filter(Boolean))].sort();
+---
+
+<Layout title="Menu Dynamique Voitures">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800">Rendu Dynamique (SSR) - Voitures</h1>
+    <p class="text-slate-500 mt-1">Pages générées à la volée sans pré-rendu.</p>
+  </div>
+  
+  <div class="flex gap-4">
+    {cylindresUniques.map((cylindre) => (
+      <a href={`/rendu-dynamique-voitures/${cylindre}`} class="px-6 py-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 hover:border-slate-400 text-slate-700 font-medium transition-all">
+        {cylindre} Cylindres
+      </a>
+    ))}
+  </div>
+</Layout>

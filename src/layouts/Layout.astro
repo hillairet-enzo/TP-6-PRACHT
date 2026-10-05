@@ -1,26 +1,80 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
 ---
 
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro Basics</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | Data Dashboard</title>
+    <!-- Le routeur client doit toujours être dans le head -->
+    <ClientRouter />
   </head>
-  <body>
-    <slot />
+  <body class="bg-slate-50 flex h-screen overflow-hidden text-slate-800 font-sans">
+    
+    <!-- Barre latérale (Sidebar) sombre et structurée -->
+    <!-- Correction Tailwind : on retire le "flex" de base pour ne garder que "hidden md:flex" -->
+    <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col">
+      <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950">
+        <span class="font-extrabold text-lg text-white uppercase tracking-wider">Data Dashboard</span>
+      </div>
+      
+      <nav class="flex-1 py-6 px-4 space-y-8 overflow-y-auto">
+        
+        <!-- Bloc Dataset : Pingouins -->
+        <div>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Dataset : Pingouins</div>
+          <div class="space-y-1">
+            <a href="/boucle-pingouins" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Boucle Map</a>
+            <a href="/rendu-dynamique" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Rendu Dynamique</a>
+            <a href="/rendu-statique" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Rendu Statique</a>
+          </div>
+        </div>
+
+        <!-- Bloc Dataset : Voitures -->
+        <div>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Dataset : Voitures</div>
+          <div class="space-y-1">
+            <a href="/boucle-voitures" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Boucle Map</a>
+            <a href="/rendu-dynamique-voitures" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Rendu Dynamique</a>
+            <a href="/rendu-statique-voitures" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Rendu Statique</a>
+          </div>
+        </div>
+
+        <!-- Bloc Dataset : Bourse (Interactivité) -->
+        <div class="mt-8">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Dataset : Bourse</div>
+          <div class="space-y-1">
+            <a href="/interactif-apple" class="block px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition-colors text-sm font-medium">Action Apple (Client-side)</a>
+          </div>
+        </div>
+
+      </nav>
+      
+      <!-- Pied de page de la sidebar -->
+      <div class="p-4 border-t border-slate-800">
+        <div class="text-xs font-medium text-slate-400">Enzo HILLAIRET</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">B.U.T. MMI 2 - Communication</div>
+      </div>
+    </aside>
+
+    <!-- Zone de contenu principal -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+      <header class="h-16 bg-white border-b border-slate-200 flex items-center px-8 shadow-sm shrink-0">
+        <h1 class="text-lg font-bold text-slate-700">{title}</h1>
+      </header>
+      
+      <main class="flex-1 overflow-y-auto p-8">
+        <slot />
+      </main>
+    </div>
+    
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-  }
-</style>

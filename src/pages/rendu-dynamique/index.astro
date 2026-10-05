@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import penguins from '../../assets/penguins.json';
+
+// On génère la liste automatiquement
+const especesUniques = [...new Set(penguins.map(p => p.species).filter(Boolean))];
+---
+
+<Layout title="Menu Dynamique">
+  <main class="max-w-4xl mx-auto py-10 px-6">
+    <a href="/" class="text-blue-500 hover:underline mb-6 inline-block">← Retour accueil</a>
+    <h1 class="text-3xl font-bold mb-8">Rendu Dynamique (SSR)</h1>
+    
+    <div class="flex gap-4">
+      {especesUniques.map((espece) => (
+        <a 
+          href={`/rendu-dynamique/${espece}`} 
+          class="p-4 bg-white border border-blue-200 rounded-lg shadow-sm hover:bg-blue-50 text-blue-600 font-bold transition-colors"
+        >
+          Voir {espece}
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>

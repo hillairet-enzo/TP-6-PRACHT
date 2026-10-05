@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Interactivité Apple">
+  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Action Apple (AAPL)</h1>
+      <p class="text-slate-500 mt-1">Interactivité côté client sans rechargement de page</p>
+    </div>
+    
+    <!-- Le menu déroulant standard en HTML -->
+    <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+      <label for="select-metrique" class="text-sm font-bold text-slate-600 pl-2">Afficher :</label>
+      <select id="select-metrique" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 cursor-pointer font-medium">
+        <option value="Close">Prix de clôture ($)</option>
+        <option value="High">Prix le plus haut ($)</option>
+        <option value="Low">Prix le plus bas ($)</option>
+        <option value="Volume">Volume d'échanges</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Le conteneur qui va accueillir le graphique dynamique -->
+  <div id="graphique-container" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-auto min-h-[400px]"></div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    import aapl from "../assets/aapl.json";
+
+    // 1. Préparation des données : Observable Plot a besoin de vrais objets Date en JavaScript
+    const dataFormatee = aapl.map((d: any) => ({
+      ...d,
+      Date: new Date(d.Date) // Conversion de la chaîne de texte en date exploitable
+    }));
+
+    const conteneur = document.querySelector('#graphique-container');
+    const select = document.querySelector('#select-metrique') as HTMLSelectElement;
+
+    // 2. Fonction centrale pour dessiner le graphique
+    function dessinerGraphique(metrique: string) {
+      if (!conteneur) return;
+      
+      // CRUCIAL : On vide le conteneur avant de redessiner pour ne pas empiler les graphiques
+      conteneur.innerHTML = ''; 
+
+      // On change la couleur si on affiche le volume pour marquer visuellement le changement
+      const couleurLigne = metrique === 'Volume' ? '#8b5cf6' : '#10b981';
+
+      const plot = Plot.plot({
+        width: 800,
+        height: 350,
+        marginRight: 40,
+        x: { type: "utc" }, // Format temporel pour l'axe X
+        y: { grid: true, label: metrique },
+        marks: [
+          Plot.lineY(dataFormatee, {
+            x: "Date",
+            y: metrique,
+            stroke: couleurLigne,
+            strokeWidth: 2,
+            tip: true // Infobulle interactive au survol
+          })
+        ]
+      });
+      
+      conteneur.append(plot);
+    }
+
+    // 3. Dessin initial au chargement de la page (utilise la valeur par défaut du select)
+    if (select) {
+      dessinerGraphique(select.value);
+
+      // 4. Écouteur d'événement : se déclenche à chaque changement du menu déroulant
+      select.addEventListener('change', (event) => {
+        const cible = event.target as HTMLSelectElement;
+        dessinerGraphique(cible.value);
+      });
+    }
+  </script>
+</Layout>
